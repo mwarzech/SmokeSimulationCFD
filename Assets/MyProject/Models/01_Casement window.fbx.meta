@@ -1,0 +1,210 @@
+fileFormatVersion: 2
+guid: d117945804cbf8e4a957dc887ff9b4ba
+ModelImporter:
+  serializedVersion: 22
+  fileIDToRecycleName:
+    100000: //RootNode
+    100002: Frame_01
+    100004: Frame_01_2
+    100006: Frame_02
+    100008: Frame_02_2
+    100010: Fused_Gaskets_01
+    100012: Fused_Gaskets_02
+    100014: Fused_Gaskets_03
+    100016: Fused_Gaskets_04
+    100018: Grip
+    100020: Grip_01
+    100022: Grip_02
+    100024: Hinge_01
+    100026: Hinge_02
+    100028: Lock_01_1
+    100030: Lock_01_2
+    100032: Lock_02
+    100034: Lock_02_1
+    100036: Lock_02_1_2
+    100038: Lock_02_2
+    100040: Lock_03
+    100042: Objekt_01
+    100044: Objekt_02
+    100046: Thermal_Glass_01
+    100048: Thermal_Glass_02
+    100050: Thermal_Glass_03
+    100052: Window
+    100054: "\u0412\u044C\u044E\u043F\u043E\u0440\u0442_CINEMA_4D"
+    400000: //RootNode
+    400002: Frame_01
+    400004: Frame_01_2
+    400006: Frame_02
+    400008: Frame_02_2
+    400010: Fused_Gaskets_01
+    400012: Fused_Gaskets_02
+    400014: Fused_Gaskets_03
+    400016: Fused_Gaskets_04
+    400018: Grip
+    400020: Grip_01
+    400022: Grip_02
+    400024: Hinge_01
+    400026: Hinge_02
+    400028: Lock_01_1
+    400030: Lock_01_2
+    400032: Lock_02
+    400034: Lock_02_1
+    400036: Lock_02_1_2
+    400038: Lock_02_2
+    400040: Lock_03
+    400042: Objekt_01
+    400044: Objekt_02
+    400046: Thermal_Glass_01
+    400048: Thermal_Glass_02
+    400050: Thermal_Glass_03
+    400052: Window
+    400054: "\u0412\u044C\u044E\u043F\u043E\u0440\u0442_CINEMA_4D"
+    2000000: "\u0412\u044C\u044E\u043F\u043E\u0440\u0442_CINEMA_4D"
+    2100000: No Name
+    2300000: Frame_01_2
+    2300002: Frame_02_2
+    2300004: Fused_Gaskets_01
+    2300006: Fused_Gaskets_02
+    2300008: Fused_Gaskets_03
+    2300010: Fused_Gaskets_04
+    2300012: Grip_01
+    2300014: Grip_02
+    2300016: Hinge_01
+    2300018: Hinge_02
+    2300020: Lock_01_1
+    2300022: Lock_01_2
+    2300024: Lock_02
+    2300026: Lock_02_1
+    2300028: Lock_02_1_2
+    2300030: Lock_02_2
+    2300032: Lock_03
+    2300034: Objekt_01
+    2300036: Objekt_02
+    2300038: Thermal_Glass_01
+    2300040: Thermal_Glass_02
+    2300042: Thermal_Glass_03
+    3300000: Frame_01_2
+    3300002: Frame_02_2
+    3300004: Fused_Gaskets_01
+    3300006: Fused_Gaskets_02
+    3300008: Fused_Gaskets_03
+    3300010: Fused_Gaskets_04
+    3300012: Grip_01
+    3300014: Grip_02
+    3300016: Hinge_01
+    3300018: Hinge_02
+    3300020: Lock_01_1
+    3300022: Lock_01_2
+    3300024: Lock_02
+    3300026: Lock_02_1
+    3300028: Lock_02_1_2
+    3300030: Lock_02_2
+    3300032: Lock_03
+    3300034: Objekt_01
+    3300036: Objekt_02
+    3300038: Thermal_Glass_01
+    3300040: Thermal_Glass_02
+    3300042: Thermal_Glass_03
+    4300000: Lock_03
+    4300002: Lock_01_2
+    4300004: Lock_01_1
+    4300006: Lock_02_2
+    4300008: Lock_02_1
+    4300010: Hinge_02
+    4300012: Hinge_01
+    4300014: Grip_01
+    4300016: Grip_02
+    4300018: Objekt_02
+    4300020: Objekt_01
+    4300022: Thermal_Glass_03
+    4300024: Thermal_Glass_02
+    4300026: Thermal_Glass_01
+    4300028: Fused_Gaskets_03
+    4300030: Fused_Gaskets_02
+    4300032: Fused_Gaskets_01
+    4300034: Frame_02_2
+    4300036: Fused_Gaskets_04
+    4300038: Lock_02_1_2
+    4300040: Lock_02
+    4300042: Frame_01_2
+  externalObjects: {}
+  materials:
+    importMaterials: 1
+    materialName: 0
+    materialSearch: 1
+    materialLocation: 1
+  animations:
+    legacyGenerateAnimations: 4
+    bakeSimulation: 0
+    resampleCurves: 1
+    optimizeGameObjects: 0
+    motionNodeName: 
+    rigImportErrors: 
+    rigImportWarnings: 
+    animationImportErrors: 
+    animationImportWarnings: 
+    animationRetargetingWarnings: 
+    animationDoRetargetingWarnings: 0
+    importAnimatedCustomProperties: 0
+    importConstraints: 0
+    animationCompression: 1
+    animationRotationError: 0.5
+    animationPositionError: 0.5
+    animationScaleError: 0.5
+    animationWrapMode: 0
+    extraExposedTransformPaths: []
+    extraUserProperties: []
+    clipAnimations: []
+    isReadable: 1
+  meshes:
+    lODScreenPercentages: []
+    globalScale: 1
+    meshCompression: 0
+    addColliders: 0
+    importVisibility: 1
+    importBlendShapes: 1
+    importCameras: 1
+    importLights: 1
+    swapUVChannels: 0
+    generateSecondaryUV: 0
+    useFileUnits: 1
+    optimizeMeshForGPU: 1
+    keepQuads: 0
+    weldVertices: 1
+    preserveHierarchy: 0
+    indexFormat: 0
+    secondaryUVAngleDistortion: 8
+    secondaryUVAreaDistortion: 15.000001
+    secondaryUVHardAngle: 88
+    secondaryUVPackMargin: 4
+    useFileScale: 1
+  tangentSpace:
+    normalSmoothAngle: 60
+    normalImportMode: 0
+    tangentImportMode: 3
+    normalCalculationMode: 4
+  importAnimation: 1
+  copyAvatar: 0
+  humanDescription:
+    serializedVersion: 2
+    human: []
+    skeleton: []
+    armTwist: 0.5
+    foreArmTwist: 0.5
+    upperLegTwist: 0.5
+    legTwist: 0.5
+    armStretch: 0.05
+    legStretch: 0.05
+    feetSpacing: 0
+    rootMotionBoneName: 
+    rootMotionBoneRotation: {x: 0, y: 0, z: 0, w: 1}
+    hasTranslationDoF: 0
+    hasExtraRoot: 0
+    skeletonHasParents: 1
+  lastHumanDescriptionAvatarSource: {instanceID: 0}
+  animationType: 0
+  humanoidOversampling: 1
+  additionalBone: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

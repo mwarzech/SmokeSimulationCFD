@@ -1,0 +1,262 @@
+﻿// Each #kernel tells which function to compile; you can have many kernels
+#pragma kernel Part1
+#pragma kernel Part2
+#pragma kernel Part3
+#pragma kernel Part4
+#pragma kernel Part5
+
+struct Voxel
+{
+	float d;
+	float3 v;
+	float curl;
+	float temp;
+};
+
+RWStructuredBuffer<Voxel> oldD;
+RWStructuredBuffer<Voxel> newD;
+
+RWTexture3D<float> Result;
+
+float visc = 0.0f;
+float diff = 0.0f;
+float Tamb;
+
+#define grid_x 32
+#define grid_y 32
+#define grid_z 32
+#define dt 0.5f
+
+#define addSource(valType)\
+{\
+		newD[cI(id)].valType += dt * oldD[cI(id)].valType;\
+}
+
+#define setBoundry(b, newD, valType) \
+{	/* check the border*/ \
+	if (id.x == 0 && id.y != 0 && id.z != 0 && id.y < grid_y - 1 && id.z < grid_z - 1)\
+		newD[cI(id)].valType = b == 1 ? -newD[cI(1, id.y, id.z)].valType : newD[cI(1, id.y, id.z)].valType;\
+	if (id.x == grid_x - 1 && id.y != 0 && id.z != 0 && id.y < grid_y - 1 && id.z < grid_z - 1)\
+		newD[cI(id)].valType = b == 1 ? -newD[cI(grid_x - 2, id.y, id.z)].valType : newD[cI(grid_x - 2, id.y, id.z)].valType;\
+	if (id.y == 0 && id.x != 0 && id.z != 0 && id.x < grid_x - 1 && id.z < grid_z - 1)\
+		newD[cI(id)].valType = b == 2 ? -newD[cI(id.x, 1, id.z)].valType : newD[cI(id.x, 1, id.z)].valType; \
+	if (id.y == grid_y - 1 && id.x != 0 && id.z != 0 && id.x < grid_x - 1 && id.z < grid_z - 1)\
+		newD[cI(id)].valType = b == 2 ? -newD[cI(id.x, grid_y - 2, id.z)].valType : newD[cI(id.x, grid_y - 2, id.z)].valType; \
+	if (id.z == 0 && id.x != 0 && id.y != 0 && id.x < grid_x - 1 && id.y < grid_y - 1)\
+		newD[cI(id)].valType = b == 3 ? -newD[cI(id.x, id.y, 1)].valType : newD[cI(id.x, id.y, 1)].valType; \
+	if (id.z == grid_z - 1 && id.x != 0 && id.y != 0 && id.x < grid_x - 1 && id.y < grid_y - 1)\
+		newD[cI(id)].valType = b == 3 ? -newD[cI(id.x, id.y, grid_z - 2)].valType : newD[cI(id.x, id.y, grid_z - 2)].valType; \
+	/* check each corner*/ \
+	if (id.x == 0 && id.y == 0 && id.z == 0)\
+		newD[cI(id)].valType = (newD[cI(1, 0, 0)].valType + newD[cI(0, 1, 0)].valType + newD[cI(0, 0, 1)].valType) / 3.0f; \
+	if (id.x == 0 && id.y == 0 && id.z == grid_z - 1)\
+		newD[cI(id)].valType = (newD[cI(1, 0, grid_z - 1)].valType + newD[cI(0, 1, grid_z - 1)].valType + newD[cI(0, 0, grid_z - 2)].valType) / 3.0f; \
+	if (id.x == 0 && id.y == grid_y - 1 && id.z == 0)\
+		newD[cI(id)].valType = (newD[cI(1, grid_y - 1, 0)].valType + newD[cI(0, grid_y - 2, 0)].valType + newD[cI(0, grid_y - 1, 1)].valType) / 3.0f; \
+	if (id.x == 0 && id.y == grid_y - 1 && id.z == grid_z - 1)\
+		newD[cI(id)].valType = (newD[cI(1, grid_y - 1, grid_z - 1)].valType + newD[cI(0, grid_y - 2, grid_z - 1)].valType + newD[cI(0, grid_y - 1, grid_z - 2)].valType) / 3.0f; \
+	if (id.x == grid_x - 1 && id.y == 0 && id.z == 0)\
+		newD[cI(id)].valType = (newD[cI(grid_x - 2, 0, 0)].valType + newD[cI(grid_x - 1, 1, 0)].valType + newD[cI(grid_x - 1, 0, 1)].valType) / 3.0f; \
+	if (id.x == grid_x - 1 && id.y == 0 && id.z == grid_z - 1)\
+		newD[cI(id)].valType = (newD[cI(grid_x - 2, 0, grid_z - 1)].valType + newD[cI(grid_x - 1, 1, grid_z - 1)].valType + newD[cI(grid_x - 1, 0, grid_z - 2)].valType) / 3.0f; \
+	if (id.x == grid_x - 1 && id.y == grid_y - 1 && id.z == 0)\
+		newD[cI(id)].valType = (newD[cI(grid_x- 2, grid_y - 1, 0)].valType + newD[cI(grid_x - 1, grid_y - 2, 0)].valType + newD[cI(grid_x - 1, grid_y - 1, 1)].valType) / 3.0f; \
+	if (id.x == grid_x - 1 && id.y == grid_y - 1 && id.z == grid_z - 1)\
+		newD[cI(id)].valType = (newD[cI(grid_x - 2, grid_y - 1, grid_z - 1)].valType + newD[cI(grid_x - 1, grid_y - 2, grid_z - 1)].valType + newD[cI(grid_x - 1, grid_y - 1, grid_z - 2)].valType) / 3.0f; \
+}
+
+#define linearSolver(b, valType, valType2, a, c)\
+{\
+	for (int n = 0; n < 20; ++n)\
+	{\
+		if (id.x >= 1 && id.x < grid_x - 1 &&\
+			id.y >= 1 && id.y < grid_y - 1 &&\
+			id.z >= 1 && id.z < grid_z - 1)\
+		{\
+			newD[cI(id)].valType = (a * (newD[cI(id.x - 1, id.y, id.z)].valType + newD[cI(id.x + 1, id.y, id.z)].valType\
+				+ newD[cI(id.x, id.y - 1, id.z)].valType + newD[cI(id.x, id.y + 1, id.z)].valType\
+				+ newD[cI(id.x, id.y, id.z - 1)].valType + newD[cI(id.x, id.y, id.z + 1)].valType)\
+				+ oldD[cI(id)].valType2) / c;\
+		}\
+		setBoundry(b, newD, valType); \
+	}\
+}
+
+#define diffuse(b, valType, diff)\
+{\
+	float a = dt * diff * grid_x * grid_y * grid_z;\
+	linearSolver(b, valType, valType, a, (1.0f + 6.0f * a));\
+}
+
+#define advect(b, a1, c1, a2, c2, a3, c3, a4, c4, a5, c5)\
+{\
+	int i0, j0, k0, i1, j1, k1;\
+	float x, y, z, r0, s0, t0, r1, s1, t1, dt0;\
+	dt0 = dt * float(grid_x - 2); \
+\
+	if (id.x >= 1 && id.x < grid_x - 1 &&\
+		id.y >= 1 && id.y < grid_y - 1 &&\
+		id.z >= 1 && id.z < grid_z - 1)\
+	{\
+		x = id.x - dt0 * a3[cI(id)].c3;\
+		y = id.y - dt0 * a4[cI(id)].c4;\
+		z = id.z - dt0 * a5[cI(id)].c5;\
+		if(x > (grid_x - 2) + 0.5) x = (grid_x - 2) + 0.5f;\
+		if (x < 0.5) x = 0.5f;\
+		i0 = (int)x;\
+		i1 = i0 + 1;\
+\
+		if (y > (grid_y - 2) + 0.5) y = (grid_y - 2) + 0.5f; \
+		if (y < 0.5) y = 0.5f; \
+		j0 = (int)y; \
+		j1 = j0 + 1;\
+\
+		if (z > (grid_z - 2) + 0.5) z = (grid_z - 2) + 0.5f; \
+		if (z < 0.5) z = 0.5f; \
+		k0 = (int)z; \
+		k1 = k0 + 1;\
+\
+		r1 = x - i0;\
+		r0 = 1 - r1;\
+		s1 = y - j0;\
+		s0 = 1 - s1;\
+		t1 = z - k0;\
+		t0 = 1 - t1;\
+\
+		a1[cI(id)].c1 = r0\
+			* (s0 * (t0 * a2[cI(i0, j0, k0)].c2 + t1 * a2[cI(i0, j0, k1)].c2)\
+			+ s1 * (t0 * a2[cI(i0, j1, k0)].c2 + t1 * a2[cI(i0, j1, k1)].c2))\
+			+ r1 * (s0 * (t0 * a2[cI(i1, j0, k0)].c2 + t1 * a2[cI(i1, j0, k1)].c2)\
+			+ s1 * (t0 * a2[cI(i1, j1, k0)].c2 + t1 * a2[cI(i1, j1, k1)].c2));\
+	}\
+	setBoundry(b, a1, c1);\
+}
+
+uint cI(uint x, uint y, uint z) {
+	return x + grid_x * y + grid_x * grid_y * z;
+}
+
+uint cI(uint3 v) {
+	return v.x + grid_x * v.y + grid_x * grid_y * v.z;
+}
+
+void project(uint3 id)
+{
+	if (id.x >= 1 && id.x < grid_x - 1 &&
+		id.y >= 1 && id.y < grid_y - 1 &&
+		id.z >= 1 && id.z < grid_z - 1)
+	{
+		oldD[cI(id)].v.y = (newD[cI(id.x + 1, id.y, id.z)].v.x - newD[cI(id.x - 1, id.y, id.z)].v.x
+			+ newD[cI(id.x, id.y + 1, id.z)].v.y - newD[cI(id.x, id.y - 1, id.z)].v.y
+			+ newD[cI(id.x, id.y, id.z + 1)].v.z + newD[cI(id.x, id.y, id.z - 1)].v.z) / -3.0f / (grid_x - 2);
+		newD[cI(id)].temp = 0;
+	}
+	setBoundry(0, oldD, v.y);
+	setBoundry(0, newD, temp);
+	linearSolver(0, temp, v.y, 1.0f, 6.0f);
+
+	if (id.x >= 1 && id.x < grid_x - 1 &&
+		id.y >= 1 && id.y < grid_y - 1 &&
+		id.z >= 1 && id.z < grid_z - 1)
+	{
+		newD[cI(id)].v.x -= 0.5f * (grid_x - 2) * (newD[cI(id.x + 1, id.y, id.z)].temp - newD[cI(id.x - 1, id.y, id.z)].temp);
+		newD[cI(id)].v.y -= 0.5f * (grid_y - 2) * (newD[cI(id.x, id.y + 1, id.z)].temp - newD[cI(id.x, id.y - 1, id.z)].temp);
+		newD[cI(id)].v.z -= 0.5f * (grid_z - 2) * (newD[cI(id.x, id.y, id.z + 1)].temp - newD[cI(id.x, id.y, id.z - 1)].temp);
+	}
+
+	setBoundry(1, newD, v.x);
+	setBoundry(2, newD, v.y);
+	setBoundry(3, newD, v.z);
+}
+
+void buoyancy(uint3 id)
+{
+	const float a = 0.000625f;
+	const float b = 0.025f;
+	if (id.x >= 1 && id.x < grid_x - 1 &&
+		id.y >= 1 && id.y < grid_y - 1 &&
+		id.z >= 1 && id.z < grid_z - 1)
+	{
+		oldD[cI(id)].v.y = a * newD[cI(id)].d - b * (newD[cI(id)].d - Tamb);
+	}
+}
+/*
+float curl(int x, int y, int z)
+{
+	/*float dw_dy = (this.w[x][y + 1][z] - this.w[x][y - 1][z]) * 0.5f;
+	float dv_dz = (this.v[x][y][z + 1] - this.v[x][y][z - 1]) * 0.5f;
+	float dw_dx = (this.w[x + 1][y][z] - this.w[x - 1][y][z]) * 0.5f;
+	float du_dz = (this.u[x][y][z + 1] - this.u[x][y][z - 1]) * 0.5f;
+	float du_dy = (this.u[x][y + 1][z] - this.u[x][y - 1][z]) * 0.5f;
+	float dv_dx = (this.v[x + 1][y][z] - this.v[x - 1][y][z]) * 0.5f;*/
+/*	float dw_dy = (newD[cI(x, y + 1, z)].v.z - newD[cI(x, y-1, z)].v.z) * 0.5f;
+	float dv_dz = (newD[cI(x, y, z + 1)].v.y - newD[cI(x, y, z - 1)].v.y) * 0.5f;
+	float dw_dx = (newD[cI(x + 1, y, z)].v.z - newD[cI(x - 1, y, z)].v.z) * 0.5f;
+	float du_dz = (newD[cI(x, y, z + 1)].v.x - newD[cI(x, y, z - 1)].v.x) * 0.5f;
+	float du_dy = (newD[cI(x, y + 1, z)].v.x - newD[cI(x, y - 1, z)].v.x) * 0.5f;
+	float dv_dx = (newD[cI(x + 1, y, z)].v.y - newD[cI(x - 1, y, z)].v.y) * 0.5f;
+
+	float i = dw_dy - dv_dz;
+	float j = -(dw_dx - du_dz);
+	float k = dv_dx - du_dy;
+
+	return (float)sqrt(i * i + j * j + k * k);
+}
+*/
+
+[numthreads(8,8,8)]
+void Part1(uint3 id : SV_DispatchThreadID)
+{
+	//Velocity solver
+	// add Source
+	addSource(v);
+
+	// bouancy
+	buoyancy(id);
+	addSource(v.y);
+}
+
+[numthreads(8, 8, 8)]
+void Part2(uint3 id : SV_DispatchThreadID)
+{
+
+	diffuse(1, v.x, visc);
+	diffuse(2, v.y, visc);
+	diffuse(3, v.z, visc);
+
+	project(id);
+}
+
+[numthreads(8, 8, 8)]
+void Part3(uint3 id : SV_DispatchThreadID)
+{
+
+	advect(1, newD, v.x, oldD, v.x, oldD, v.x, oldD, v.y, oldD, v.z);
+	advect(2, newD, v.y, oldD, v.y, oldD, v.x, oldD, v.y, oldD, v.z);
+	advect(3, newD, v.z, oldD, v.z, oldD, v.x, oldD, v.y, oldD, v.z);
+
+	project(id);
+
+	oldD[cI(id.x, id.y, id.z)].v = float3(0, 0, 0);
+
+	//Density solver
+	addSource(d);
+}
+
+[numthreads(8, 8, 8)]
+void Part4(uint3 id : SV_DispatchThreadID)
+{
+
+	diffuse(0, d, diff);
+}
+
+[numthreads(8, 8, 8)]
+void Part5(uint3 id : SV_DispatchThreadID)
+{
+
+	advect(0, newD, d, oldD, d, newD, v.x, newD, v.y, newD, v.z);
+
+	oldD[cI(id)].d = 0;
+
+	Result[id] = newD[cI(id)].d;
+}

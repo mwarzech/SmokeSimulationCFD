@@ -1,0 +1,18 @@
+﻿// Each #kernel tells which function to compile; you can have many kernels
+#pragma kernel CSMain
+
+// Create a RenderTexture with enableRandomWrite flag and set it
+// with cs.SetTexture
+
+float3 gridSize;
+
+RWStructuredBuffer<float> Source;
+RWTexture3D<float4> Result;
+
+[numthreads(8,8,8)]
+void CSMain (uint3 id : SV_DispatchThreadID)
+{
+	// TODO: insert actual code here!
+
+	Result[id] = Source[id.x + gridSize.x * id.y + gridSize.x * gridSize.y * id.z];
+}
